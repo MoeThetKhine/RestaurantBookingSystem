@@ -55,6 +55,7 @@ public class BookingController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
     [HttpDelete]
     [Route("/api/Booking/{id}")]
     public async Task<IActionResult> DeleteBooking(long id)
