@@ -13,6 +13,7 @@ public class BranchController : ControllerBase
     {
         _appDbContext = appDbContext;
     }
+
     [HttpGet]
     [Route("/api/Branch")]
     public async Task<IActionResult> GetBranches()
