@@ -85,6 +85,7 @@ public class TableController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
     [HttpDelete]
     [Route("/api/Tables/{id}")]
     public async Task<IActionResult>DeleteTables(long id)
