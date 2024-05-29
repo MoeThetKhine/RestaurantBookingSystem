@@ -30,7 +30,7 @@ public class BranchController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
-    
+
     [HttpPost]
     [Route("/api/Branch")]
     public async Task<IActionResult> CreateBranches([FromBody] BranchManagementModel managementmodel)
@@ -43,7 +43,7 @@ public class BranchController : ControllerBase
             }
             var item = await _appDbContext.Branches
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x=> x.BranchName == managementmodel.BranchName && x.BranchCode == managementmodel.BranchCode && x.IsActive );
+                .FirstOrDefaultAsync(x => x.BranchName == managementmodel.BranchName && x.BranchCode == managementmodel.BranchCode && x.IsActive);
             if (item is not null)
                 return Conflict("Branch Name already exists");
             await _appDbContext.Branches.AddAsync(managementmodel);
@@ -58,11 +58,11 @@ public class BranchController : ControllerBase
 
     [HttpDelete]
     [Route("/api/Branch")]
-    public async Task<IActionResult>DeleteBranches(long id)
+    public async Task<IActionResult> DeleteBranches(long id)
     {
         try
         {
-            if(id <= 0)
+            if (id <= 0)
                 return BadRequest();
             var item = await _appDbContext.Branches
                 .AsNoTracking()
@@ -79,5 +79,5 @@ public class BranchController : ControllerBase
         {
             throw new Exception(ex.Message);
         }
-    } 
+    }
 }
