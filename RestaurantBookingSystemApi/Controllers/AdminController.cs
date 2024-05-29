@@ -14,6 +14,7 @@ namespace RestaurantBookingSystemApi.Controllers
         {
             _appDbContext = appDbContext;
         }
+
         [HttpGet]
         [Route("/api/User")]
         public async Task<IActionResult> GetUsers()
