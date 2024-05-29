@@ -13,7 +13,7 @@ public class TableController : ControllerBase
     {
         _appDbContext = appDbContext;
     }
-    
+
     [HttpGet]
     [Route("/api/Tables")]
 
@@ -21,20 +21,20 @@ public class TableController : ControllerBase
     {
         try
         {
-            List<TablesManagementModel>lst=await _appDbContext.Tables
+            List<TablesManagementModel> lst = await _appDbContext.Tables
                 .AsNoTracking()
                 .ToListAsync();
-            return Ok(lst); 
+            return Ok(lst);
         }
-        catch (Exception ex) 
-        { 
-        throw new Exception(ex.Message);
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
         }
     }
 
     [HttpPost]
     [Route("/api/Tables")]
-    public async Task<IActionResult> CreateTables([FromBody]TablesManagementModel managementModel)
+    public async Task<IActionResult> CreateTables([FromBody] TablesManagementModel managementModel)
     {
         try
         {
@@ -59,15 +59,15 @@ public class TableController : ControllerBase
 
     [HttpPut]
     [Route("/api/Tables")]
-    public async Task<IActionResult> UpdateTables([FromBody]TableRequestModel requestModel,long id)
+    public async Task<IActionResult> UpdateTables([FromBody] TableRequestModel requestModel, long id)
     {
         try
         {
-            if(string.IsNullOrEmpty(requestModel.TableNumber)|| id <= 0)
+            if (string.IsNullOrEmpty(requestModel.TableNumber) || id <= 0)
                 return BadRequest();
             bool isDuplicate = await _appDbContext.Tables
                 .AsNoTracking()
-                .AnyAsync(x=> x.TableNumber == requestModel.TableNumber && x.BranchCode == requestModel.BranchCode && x.IsAvailable && x.TableId != id );
+                .AnyAsync(x => x.TableNumber == requestModel.TableNumber && x.BranchCode == requestModel.BranchCode && x.IsAvailable && x.TableId != id);
             if (isDuplicate)
                 return Conflict("Table Number already exists");
             var item = await _appDbContext.Tables
@@ -88,7 +88,7 @@ public class TableController : ControllerBase
 
     [HttpDelete]
     [Route("/api/Tables/{id}")]
-    public async Task<IActionResult>DeleteTables(long id)
+    public async Task<IActionResult> DeleteTables(long id)
     {
         try
         {
@@ -102,7 +102,7 @@ public class TableController : ControllerBase
             item.IsAvailable = false;
             _appDbContext.Entry(item).State = EntityState.Modified;
             int result = await _appDbContext.SaveChangesAsync();
-            return result > 0 ? StatusCode(202, "Deleting Successful") : BadRequest("Deleting Fail"); 
+            return result > 0 ? StatusCode(202, "Deleting Successful") : BadRequest("Deleting Fail");
         }
         catch (Exception ex)
         {
