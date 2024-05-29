@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using RestaurantBookingSystemApi.Data;
-using RestaurantBookingSystemApi.Model.Admin;
 using RestaurantBookingSystemApi.Model.Branch;
 
 namespace RestaurantBookingSystemApi.Controllers
