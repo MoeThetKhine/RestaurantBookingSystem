@@ -33,7 +33,7 @@ public class BookingController : ControllerBase
 
     [HttpPost]
     [Route("/api/Booking")]
-    public async Task<IActionResult> CreateBooking([FromBody]BookingManagementModel managementmodel)
+    public async Task<IActionResult> CreateBooking([FromBody] BookingManagementModel managementmodel)
     {
         try
         {
@@ -62,12 +62,12 @@ public class BookingController : ControllerBase
     {
         try
         {
-            if(id <= 0)
+            if (id <= 0)
                 return BadRequest();
             var item = await _appDbContext.Booking
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.BookingId == id && x.IsBooked);
-            if(item is null)
+            if (item is null)
                 return NotFound("Booking Not Found or Active");
             item.IsBooked = false;
             _appDbContext.Entry(item).State = EntityState.Modified;
