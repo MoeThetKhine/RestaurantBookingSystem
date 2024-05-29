@@ -55,6 +55,7 @@ public class BranchController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
     [HttpDelete]
     [Route("/api/Branch")]
     public async Task<IActionResult>DeleteBranches(long id)
