@@ -22,5 +22,4 @@ namespace RestaurantBookingSystemApi.Data
         public DbSet<TablesManagementModel> Tables { get; set; }
         public DbSet<BookingManagementModel> Booking { get; set; }
     }
-
 }
