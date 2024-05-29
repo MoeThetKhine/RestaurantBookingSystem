@@ -1,7 +1,10 @@
-﻿namespace RestaurantBookingSystemApi.Model.Booking
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace RestaurantBookingSystemApi.Model.Booking
 {
     public class BookingManagementModel
     {
+        [Key]
         public long BookingId {  get; set; }
         public string CustomerName { get; set; }
         public string PhoneNumber {  get; set; }
