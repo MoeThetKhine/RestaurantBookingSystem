@@ -56,6 +56,7 @@ public class TableController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
     [HttpPut]
     [Route("/api/Tables")]
     public async Task<IActionResult> UpdateTables([FromBody]TableRequestModel requestModel,long id)
