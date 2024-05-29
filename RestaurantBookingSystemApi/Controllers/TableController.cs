@@ -109,6 +109,4 @@ public class TableController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
-
-
 }
