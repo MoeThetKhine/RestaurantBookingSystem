@@ -56,6 +56,7 @@ namespace RestaurantBookingSystemApi.Controllers
                 throw new Exception(ex.Message);
             }
         }
+
         [HttpPut]
         [Route("/api/User")]
         public async Task<IActionResult> UpdateUser([FromBody]AdminManagementModel requestmodel,long id)
