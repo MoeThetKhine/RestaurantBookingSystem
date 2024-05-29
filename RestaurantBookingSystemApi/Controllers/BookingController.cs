@@ -13,6 +13,7 @@ public class BookingController : ControllerBase
     {
         _appDbContext = appDbContext;
     }
+
     [HttpGet]
     [Route("/api/Booking")]
     public async Task<IActionResult> GetBooking()
