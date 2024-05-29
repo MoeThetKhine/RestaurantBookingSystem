@@ -31,6 +31,7 @@ public class TableController : ControllerBase
         throw new Exception(ex.Message);
         }
     }
+
     [HttpPost]
     [Route("/api/Tables")]
     public async Task<IActionResult> CreateTables([FromBody]TablesManagementModel managementModel)
