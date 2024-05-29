@@ -20,7 +20,7 @@ public class AdminController : ControllerBase
     {
         try
         {
-            List<AdminManagementModel>lst = await _appDbContext.Users
+            List<AdminManagementModel> lst = await _appDbContext.Users
                 .AsNoTracking()
                 .ToListAsync();
             return Ok(lst);
@@ -58,20 +58,20 @@ public class AdminController : ControllerBase
 
     [HttpPut]
     [Route("/api/User")]
-    public async Task<IActionResult> UpdateUser([FromBody]AdminManagementModel requestmodel,long id)
+    public async Task<IActionResult> UpdateUser([FromBody] AdminManagementModel requestmodel, long id)
     {
         try
         {
-            if(string.IsNullOrEmpty(requestmodel.BranchCode) || id <= 0)
+            if (string.IsNullOrEmpty(requestmodel.BranchCode) || id <= 0)
                 return BadRequest();
             bool isDuplicate = await _appDbContext.Users
                 .AsNoTracking()
-                .AnyAsync(x => x.BranchCode == requestmodel.BranchCode && x.IsActive && x.UserId != id );
-            if(isDuplicate)
+                .AnyAsync(x => x.BranchCode == requestmodel.BranchCode && x.IsActive && x.UserId != id);
+            if (isDuplicate)
                 return Conflict("BranchCode already exists!");
-            var item = await _appDbContext.Users 
+            var item = await _appDbContext.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x=> x.UserId == id && x.IsActive);
+                .FirstOrDefaultAsync(x => x.UserId == id && x.IsActive);
             if (item is null)
                 return NotFound("BranchCode  Not Found Or Active");
             item.UserName = requestmodel.UserName;
@@ -88,15 +88,15 @@ public class AdminController : ControllerBase
 
     [HttpDelete]
     [Route("/api/User/{id}")]
-    public async Task<IActionResult>DeleteUser(long id)
+    public async Task<IActionResult> DeleteUser(long id)
     {
         try
         {
-            if(id <= 0)
+            if (id <= 0)
                 return BadRequest();
             var item = await _appDbContext.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x=> x.UserId == id && x.IsActive);
+                .FirstOrDefaultAsync(x => x.UserId == id && x.IsActive);
             if (item is null)
                 return NotFound("Admin not found or Active");
             item.IsActive = false;
@@ -108,5 +108,5 @@ public class AdminController : ControllerBase
         {
             throw new Exception(ex.Message);
         }
-    } 
+    }
 }
