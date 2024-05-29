@@ -30,6 +30,7 @@ public class BookingController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
     [HttpPost]
     [Route("/api/Booking")]
     public async Task<IActionResult> CreateBooking([FromBody]BookingManagementModel managementmodel)
