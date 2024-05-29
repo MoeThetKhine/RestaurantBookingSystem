@@ -86,9 +86,9 @@ namespace RestaurantBookingSystemApi.Controllers
                 throw new Exception(ex.Message);
             }
         }
+
         [HttpDelete]
         [Route("/api/User/{id}")]
-
         public async Task<IActionResult>DeleteUser(long id)
         {
             try
