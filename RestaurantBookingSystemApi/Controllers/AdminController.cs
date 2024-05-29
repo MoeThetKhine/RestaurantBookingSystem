@@ -75,7 +75,7 @@ namespace RestaurantBookingSystemApi.Controllers
                 item.UserName = requestmodel.UserName;
                 _appDbContext.Entry(item).State = EntityState.Modified;
                 int result = await _appDbContext.SaveChangesAsync();
-                return result > 0 ? StatusCode(202, "Upding Successful") :
+                return result > 0 ? StatusCode(202, "Updating Successful") :
                 BadRequest("Updating Fai");
             }
             catch (Exception ex)
