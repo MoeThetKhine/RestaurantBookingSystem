@@ -31,6 +31,7 @@ namespace RestaurantBookingSystemApi.Controllers
                 throw new Exception(ex.Message);
             }
         }
+
         [HttpPost]
         [Route("/api/User")]
         public async Task<IActionResult> CreateUser([FromBody] AdminManagementModel managementmodel)
