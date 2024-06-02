@@ -23,6 +23,7 @@ public class BranchController : ControllerBase
             List<BranchManagementModel> lst = await _appDbContext.Branches
                 .AsNoTracking()
                 .ToListAsync();
+
             return Ok(lst);
         }
         catch (Exception ex)
@@ -38,16 +39,19 @@ public class BranchController : ControllerBase
         try
         {
             if (string.IsNullOrEmpty(managementmodel.BranchCode) || string.IsNullOrEmpty(managementmodel.BranchName))
-            {
                 return BadRequest();
-            }
+
             var item = await _appDbContext.Branches
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x =>  x.BranchCode == managementmodel.BranchCode && x.BranchName == managementmodel.BranchName && x.IsActive);
+                .FirstOrDefaultAsync(x => x.BranchCode == managementmodel.BranchCode
+                && x.BranchName == managementmodel.BranchName && x.IsActive);
+
             if (item is not null)
                 return Conflict("Branch already exists");
+
             await _appDbContext.Branches.AddAsync(managementmodel);
             int result = await _appDbContext.SaveChangesAsync();
+
             return result > 0 ? StatusCode(201, "Creating Successful") : BadRequest("Creating Fail");
         }
         catch (Exception ex)
@@ -64,14 +68,18 @@ public class BranchController : ControllerBase
         {
             if (id <= 0)
                 return BadRequest();
+
             var item = await _appDbContext.Branches
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.BranchId == id && x.IsActive);
+
             if (item is null)
                 return NotFound("Branch Name Not Found or Active");
+
             item.IsActive = false;
             _appDbContext.Entry(item).State = EntityState.Modified;
             int result = await _appDbContext.SaveChangesAsync();
+
             return result > 0 ? StatusCode(202, "Deleting Successful") : BadRequest("Deleting Fail");
 
         }
