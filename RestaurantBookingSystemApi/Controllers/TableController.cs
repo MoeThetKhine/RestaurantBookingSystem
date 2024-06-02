@@ -38,7 +38,7 @@ public class TableController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrEmpty(managementModel.TableNumber))
+            if (string.IsNullOrEmpty(managementModel.TableNumber) || string.IsNullOrEmpty(managementModel.Capacity) || string.IsNullOrEmpty(managementModel.Location) || string.IsNullOrEmpty(managementModel.BranchCode))
             {
                 return BadRequest();
             }
@@ -46,7 +46,7 @@ public class TableController : ControllerBase
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.TableNumber == managementModel.TableNumber && x.BranchCode == managementModel.BranchCode && x.IsAvailable);
             if (item is not null)
-                return Conflict("Table Number already exists!");
+                return Conflict("Table Number already exists in this BranchCode!");
             await _appDbContext.Tables.AddAsync(managementModel);
             int result = await _appDbContext.SaveChangesAsync();
             return result > 0 ? StatusCode(201, "Creating Successful") : BadRequest("Creating Fail");
@@ -72,10 +72,10 @@ public class TableController : ControllerBase
                 return Conflict("Table Number already exists");
             var item = await _appDbContext.Tables
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.TableId == id && x.IsAvailable);
+                .FirstOrDefaultAsync(x => x.TableId == id && x.IsAvailable == false);
             if (item is null)
                 return NotFound("Table Not Found Or IsActive");
-            item.TableNumber = requestModel.TableNumber;
+            item.IsAvailable = true;
             _appDbContext.Entry(item).State = EntityState.Modified;
             int result = await _appDbContext.SaveChangesAsync();
             return result > 0 ? StatusCode(202, "Updating Successful") : BadRequest("Updating Fail");

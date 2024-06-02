@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using RestaurantBookingSystemApi.Data;
 using RestaurantBookingSystemApi.Model.Booking;
+using RestaurantBookingSystemApi.Model.Tables;
 
 namespace RestaurantBookingSystemApi.Controllers;
 
@@ -37,15 +39,24 @@ public class BookingController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrEmpty(managementmodel.CustomerName))
+            if (string.IsNullOrEmpty(managementmodel.CustomerName) ||
+                string.IsNullOrEmpty(managementmodel.PhoneNumber) || 
+                string.IsNullOrEmpty(managementmodel.NumberOfPeople) ||
+                string.IsNullOrEmpty(managementmodel.BranchCode) ||
+                string.IsNullOrEmpty(managementmodel.TableNumber) || 
+                string.IsNullOrEmpty(managementmodel.UserName))
             {
                 return BadRequest();
             }
+            if (managementmodel.BookingDateAndTime < DateTime.Now)
+            {
+                return BadRequest("Your Booking is not approved");
+            }
             var item = await _appDbContext.Booking
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.CustomerName == managementmodel.CustomerName && x.IsBooked);
+                .FirstOrDefaultAsync(x => x.CustomerName == managementmodel.CustomerName  && x.BookingDateAndTime == managementmodel.BookingDateAndTime && x.IsBooked);
             if (item is not null)
-                return Conflict("CustomerName already exist");
+                return Conflict("Customer with same Booking Date/Time is already exist");
             await _appDbContext.Booking.AddAsync(managementmodel);
             int result = await _appDbContext.SaveChangesAsync();
             return result > 0 ? StatusCode(201, "Creating Successful") : BadRequest("Creating Fail");

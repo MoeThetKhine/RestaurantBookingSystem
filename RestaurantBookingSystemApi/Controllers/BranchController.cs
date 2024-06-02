@@ -37,15 +37,15 @@ public class BranchController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrEmpty(managementmodel.BranchName))
+            if (string.IsNullOrEmpty(managementmodel.BranchCode) || string.IsNullOrEmpty(managementmodel.BranchName))
             {
                 return BadRequest();
             }
             var item = await _appDbContext.Branches
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.BranchName == managementmodel.BranchName && x.BranchCode == managementmodel.BranchCode && x.IsActive);
+                .FirstOrDefaultAsync(x =>  x.BranchCode == managementmodel.BranchCode && x.BranchName == managementmodel.BranchName && x.IsActive);
             if (item is not null)
-                return Conflict("Branch Name already exists");
+                return Conflict("Branch already exists");
             await _appDbContext.Branches.AddAsync(managementmodel);
             int result = await _appDbContext.SaveChangesAsync();
             return result > 0 ? StatusCode(201, "Creating Successful") : BadRequest("Creating Fail");

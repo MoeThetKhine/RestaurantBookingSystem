@@ -14,9 +14,9 @@ public class AdminController : ControllerBase
         _appDbContext = appDbContext;
     }
 
-    [HttpGet]
-    [Route("/api/User")]
-    public async Task<IActionResult> GetUsers()
+    /*[HttpGet]
+    [Route("/api/User/branchcode")]
+    public async Task<IActionResult> GetUsers(string branchcode)
     {
         try
         {
@@ -24,6 +24,20 @@ public class AdminController : ControllerBase
                 .AsNoTracking()
                 .ToListAsync();
             return Ok(lst);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    } */
+
+    [HttpGet]
+    [Route("/api/User/branchcode")]
+    public async Task<IActionResult> GetUsers(string branchcode)
+    {
+        try
+        {
+            var branch
         }
         catch (Exception ex)
         {
@@ -37,7 +51,7 @@ public class AdminController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrEmpty(managementmodel.BranchCode) || string.IsNullOrEmpty(managementmodel.UserName) || string.IsNullOrEmpty(managementmodel.Email))
+            if (string.IsNullOrEmpty(managementmodel.UserName) || string.IsNullOrEmpty(managementmodel.Email) || string.IsNullOrEmpty(managementmodel.Password) || string.IsNullOrEmpty(managementmodel.BranchCode))
             {
                 return BadRequest();
             }
@@ -48,7 +62,7 @@ public class AdminController : ControllerBase
                 return Conflict("Admin already exists!");
             await _appDbContext.Users.AddAsync(managementmodel);
             int result = await _appDbContext.SaveChangesAsync();
-            return result > 0 ? StatusCode(201, "Branchcode Successful") : BadRequest("Branchcode Fail");
+            return result > 0 ? StatusCode(201, "Creating Successful") : BadRequest("Creating Fail");
         }
         catch (Exception ex)
         {
@@ -62,23 +76,24 @@ public class AdminController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrEmpty(requestmodel.BranchCode) || id <= 0)
+            if (string.IsNullOrEmpty(requestmodel.UserName) || string.IsNullOrEmpty(requestmodel.Email) || string.IsNullOrEmpty(requestmodel.Password) || string.IsNullOrEmpty(requestmodel.BranchCode) || id <= 0)
+                //if (string.IsNullOrEmpty(requestmodel.Password) || id <= 0)
                 return BadRequest();
             bool isDuplicate = await _appDbContext.Users
                 .AsNoTracking()
                 .AnyAsync(x => x.BranchCode == requestmodel.BranchCode && x.IsActive && x.UserId != id);
             if (isDuplicate)
-                return Conflict("BranchCode already exists!");
+                return Conflict("Admin already exists!");
             var item = await _appDbContext.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == id && x.IsActive);
             if (item is null)
-                return NotFound("BranchCode  Not Found Or Active");
-            item.UserName = requestmodel.UserName;
+                return NotFound("Admin Not Found Or Active");
+            item.Password = requestmodel.Password;
             _appDbContext.Entry(item).State = EntityState.Modified;
             int result = await _appDbContext.SaveChangesAsync();
             return result > 0 ? StatusCode(202, "Updating Successful") :
-            BadRequest("Updating Fai");
+            BadRequest("Updating Fail");
         }
         catch (Exception ex)
         {
@@ -100,7 +115,7 @@ public class AdminController : ControllerBase
             if (item is null)
                 return NotFound("Admin not found or Active");
             item.IsActive = false;
-            _appDbContext.Entry(item).State |= EntityState.Modified;
+            _appDbContext.Entry(item).State = EntityState.Modified;
             int result = await _appDbContext.SaveChangesAsync();
             return result > 0 ? StatusCode(202, "Deleting Successful") : BadRequest("Deleting Fail");
         }
