@@ -37,7 +37,7 @@ public class AdminController : ControllerBase
     {
         try
         {
-            var branch
+            var branch = await _appDbC
         }
         catch (Exception ex)
         {
