@@ -98,16 +98,18 @@ public class AdminController : ControllerBase
                 .AnyAsync(x => x.BranchCode == requestModel.BranchCode && x.IsActive && x.UserId != id);
             if (isDuplicate)
                 return Conflict("Admin already exists!");
+
             var item = await _appDbContext.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == id && x.IsActive);
             if (item is null)
-                return NotFound("Admin Not Found Or Active");
+                return NotFound("Admin Not Found Or InActive");
+
             item.Password = requestModel.Password;
             _appDbContext.Entry(item).State = EntityState.Modified;
             int result = await _appDbContext.SaveChangesAsync();
-            return result > 0 ? StatusCode(202, "Updating Successful") :
-            BadRequest("Updating Fail");
+
+            return result > 0 ? StatusCode(202, "Updating Successful") : BadRequest("Updating Fail");
         }
         catch (Exception ex)
         {
@@ -123,14 +125,17 @@ public class AdminController : ControllerBase
         {
             if (id <= 0)
                 return BadRequest();
+
             var item = await _appDbContext.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.UserId == id && x.IsActive);
             if (item is null)
                 return NotFound("Admin not found or Active");
+
             item.IsActive = false;
             _appDbContext.Entry(item).State = EntityState.Modified;
             int result = await _appDbContext.SaveChangesAsync();
+
             return result > 0 ? StatusCode(202, "Deleting Successful") : BadRequest("Deleting Fail");
         }
         catch (Exception ex)
