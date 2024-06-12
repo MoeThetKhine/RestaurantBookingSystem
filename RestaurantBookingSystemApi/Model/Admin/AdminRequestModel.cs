@@ -1,4 +1,6 @@
-﻿namespace RestaurantBookingSystemApi.Model.Admin;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace RestaurantBookingSystemApi.Model.Admin;
 
 public class AdminRequestModel
 {

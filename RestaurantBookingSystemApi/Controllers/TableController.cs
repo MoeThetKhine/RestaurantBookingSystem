@@ -13,8 +13,7 @@ public class TableController : ControllerBase
     {
         _appDbContext = appDbContext;
     }
-
-    [HttpGet]
+    /*[HttpGet]
     [Route("/api/Tables")]
 
     public async Task<IActionResult> GetTables()
@@ -24,6 +23,28 @@ public class TableController : ControllerBase
             List<TablesManagementModel> lst = await _appDbContext.Tables
                 .AsNoTracking()
                 .ToListAsync();
+            return Ok(lst);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
+    }
+    */
+    [HttpGet]
+    [Route("/api/Tables/{branchCode}")]
+    public async Task<IActionResult> GetTables(string branchCode)
+    {
+        try
+        {
+            List<TablesManagementModel> lst = await _appDbContext.Tables
+                .Where(b => b.BranchCode == branchCode && b.IsAvailable == true)
+                .AsNoTracking()
+                .ToListAsync();
+            if (branchCode == null)
+            {
+                return NotFound();
+            }
             return Ok(lst);
         }
         catch (Exception ex)
@@ -42,13 +63,10 @@ public class TableController : ControllerBase
 
             if (string.IsNullOrEmpty(managementModel.TableNumber))
                 return BadRequest();
-
             if (string.IsNullOrEmpty(managementModel.Capacity))
                 return BadRequest();
-
             if (string.IsNullOrEmpty(managementModel.Location))
                 return BadRequest();
-
             if (string.IsNullOrEmpty(managementModel.BranchCode))
                 return BadRequest();
 

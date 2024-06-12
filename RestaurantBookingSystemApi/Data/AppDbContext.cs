@@ -12,7 +12,6 @@ public class AppDbContext : DbContext
     {
 
     }
-
     public DbSet<AdminManagementModel> Users { get; set; }
     public DbSet<BranchManagementModel> Branches { get; set; }
     public DbSet<TablesManagementModel> Tables { get; set; }

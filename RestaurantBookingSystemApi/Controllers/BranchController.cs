@@ -20,11 +20,13 @@ public class BranchController : ControllerBase
     {
         try
         {
-            List<BranchManagementModel> lst = await _appDbContext.Branches
-                .AsNoTracking()
-                .ToListAsync();
+           // List<BranchManagementModel> lst = await _appDbContext.Branches
+            var branch = await _appDbContext.Branches
+            .Where(b => b.IsActive == true)
+            .AsNoTracking()
+            .ToListAsync();
 
-            return Ok(lst);
+            return Ok(branch);
         }
         catch (Exception ex)
         {
