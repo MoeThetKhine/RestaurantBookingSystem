@@ -40,7 +40,9 @@ public class BranchController : ControllerBase
     {
         try
         {
-            if (string.IsNullOrEmpty(managementmodel.BranchCode) || string.IsNullOrEmpty(managementmodel.BranchName))
+            if (string.IsNullOrEmpty(managementmodel.BranchCode)) 
+                return BadRequest();
+            if (string.IsNullOrEmpty(managementmodel.BranchName))
                 return BadRequest();
 
             var item = await _appDbContext.Branches

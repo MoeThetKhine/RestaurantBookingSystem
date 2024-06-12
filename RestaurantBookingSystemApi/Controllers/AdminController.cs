@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using RestaurantBookingSystemApi.Data;
 using RestaurantBookingSystemApi.Model.Admin;
+using RestaurantBookingSystemApi.Model.Tables;
+using System.Text.RegularExpressions;
 
 namespace RestaurantBookingSystemApi.Controllers;
 
@@ -37,7 +39,16 @@ public class AdminController : ControllerBase
     {
         try
         {
-            var branch = await _appDbC
+           // List<TablesManagementModel> lst = await _appDbContext.Users
+                var user = await _appDbContext.Users
+                .Where(b => b.BranchCode == branchcode && b.IsActive == true)
+                .AsNoTracking()
+                .ToListAsync();
+            if (branchcode == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
         }
         catch (Exception ex)
         {
@@ -49,18 +60,37 @@ public class AdminController : ControllerBase
     [Route("/api/User")]
     public async Task<IActionResult> CreateUser([FromBody] AdminManagementModel managementModel)
     {
+        const string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+        const string passpattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+
         try
         {
-            if (string.IsNullOrEmpty(managementModel.UserName) || string.IsNullOrEmpty(managementModel.Email) || string.IsNullOrEmpty(managementModel.Password) || string.IsNullOrEmpty(managementModel.BranchCode))
-            {
-                return BadRequest();
-            }
+            if (string.IsNullOrEmpty(managementModel.UserName))
+                return BadRequest("UserName cannot empty");
+            if (string.IsNullOrEmpty(managementModel.Email))
+                return BadRequest("Email cannot empty");
+            if (string.IsNullOrEmpty(managementModel.Password))
+                return BadRequest("Password cannot empty");
+            if (string.IsNullOrEmpty(managementModel.BranchCode))
+                return BadRequest("BranchCode cannot empty");
+            if (string.IsNullOrEmpty(managementModel.UserRole))
+                return BadRequest("UserRole cannot empty");
+            if (managementModel.UserRole != "Admin")
+                return BadRequest("UserRole must be only Admin");
+            if (!(Regex.IsMatch(managementModel.Email.ToString(), pattern)))
+                return BadRequest("Invalid email format.");
+            if (!(Regex.IsMatch(managementModel.Password.ToString(), passpattern)))
+                return BadRequest("Password must be at least 8 characters long and " +
+                    "contain an uppercase " + "letter, " +
+                    "a lowercase letter, a number, and a special character.");
+            if (managementModel.BranchCode.Length != 5)
+                return BadRequest("BranchCode must be only 5  character");
 
             var item = await _appDbContext.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.BranchCode == managementModel.BranchCode && x.IsActive);
             if (item is not null)
-                return Conflict("Admin already exists!");
+                return Conflict("Admin already exists with that BranchCode!");
             await _appDbContext.Users.AddAsync(managementModel);
             int result = await _appDbContext.SaveChangesAsync();
 
@@ -71,7 +101,6 @@ public class AdminController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
-
     [HttpPut]
     [Route("/api/User")]
     public async Task<IActionResult> UpdateUser([FromBody] AdminManagementModel requestModel, long id)
@@ -79,17 +108,15 @@ public class AdminController : ControllerBase
         try
         {
             if (string.IsNullOrEmpty(requestModel.UserName))
-                return BadRequest();
-
+                return BadRequest("UserName cannot empty");
             if (string.IsNullOrEmpty(requestModel.Email))
-                return BadRequest();
-
+                return BadRequest("Email cannot empty");
             if (string.IsNullOrEmpty(requestModel.Password))
-                return BadRequest();
-
+                return BadRequest("Password cannot empty");
             if (string.IsNullOrEmpty(requestModel.BranchCode))
-                return BadRequest();
-
+                return BadRequest("BranchCode cannot empty");
+            if (string.IsNullOrEmpty(requestModel.UserRole))
+                return BadRequest("UserRole cannot empty");
             if (id <= 0)
                 return BadRequest();
 
