@@ -41,9 +41,9 @@ public class TableController : ControllerBase
                 .Where(b => b.BranchCode == branchCode && b.IsAvailable == true)
                 .AsNoTracking()
                 .ToListAsync();
-            if (branchCode == null)
+            if (lst == null || lst.Count == 0)
             {
-                return NotFound();
+                return NotFound("No available tables found for the given branch code.");
             }
             return Ok(lst);
         }

@@ -39,15 +39,20 @@ public class AdminController : ControllerBase
     {
         try
         {
-           // List<TablesManagementModel> lst = await _appDbContext.Users
-                var user = await _appDbContext.Users
+            //if (string.IsNullOrEmpty(branchcode))
+            //{
+            //    return BadRequest("Branch code cannot be null or empty.");
+            //}
+            // List<TablesManagementModel> lst = await _appDbContext.Users
+            var user = await _appDbContext.Users
                 .Where(b => b.BranchCode == branchcode && b.IsActive == true)
                 .AsNoTracking()
-                .ToListAsync();
-            if (branchcode == null)
+                .FirstOrDefaultAsync();
+            if (user == null)
             {
-                return NotFound();
+                return NotFound("No active user found for the given branch code.");
             }
+
             return Ok(user);
         }
         catch (Exception ex)
@@ -105,9 +110,10 @@ public class AdminController : ControllerBase
     [Route("/api/User")]
     public async Task<IActionResult> UpdateUser([FromBody] AdminManagementModel requestModel, long id)
     {
+        const string passpattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
         try
         {
-            if (string.IsNullOrEmpty(requestModel.UserName))
+           /* if (string.IsNullOrEmpty(requestModel.UserName))
                 return BadRequest("UserName cannot empty");
             if (string.IsNullOrEmpty(requestModel.Email))
                 return BadRequest("Email cannot empty");
@@ -116,7 +122,11 @@ public class AdminController : ControllerBase
             if (string.IsNullOrEmpty(requestModel.BranchCode))
                 return BadRequest("BranchCode cannot empty");
             if (string.IsNullOrEmpty(requestModel.UserRole))
-                return BadRequest("UserRole cannot empty");
+                return BadRequest("UserRole cannot empty");*/
+             if (!(Regex.IsMatch(requestModel.Password.ToString(), passpattern)))
+                return BadRequest("Password must be at least 8 characters long and " +
+                    "contain an uppercase " + "letter, " +
+                    "a lowercase letter, a number, and a special character.");
             if (id <= 0)
                 return BadRequest();
 
