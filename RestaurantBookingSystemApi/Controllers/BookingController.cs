@@ -32,27 +32,27 @@ public class BookingController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
-    
-   
+
+
     [HttpPost]
     [Route("/api/Booking")]
     public async Task<IActionResult> CreateBooking([FromBody] BookingManagementModel managementmodel)
     {
         try
         {
-            #region Validation
+           #region Validation
 
             if (string.IsNullOrEmpty(managementmodel.CustomerName))
                 return BadRequest();
 
-            if (string.IsNullOrEmpty(managementmodel.PhoneNumber))
-                return BadRequest();
+           if (string.IsNullOrEmpty(managementmodel.PhoneNumber))
+               return BadRequest();
 
             if (string.IsNullOrEmpty(managementmodel.NumberOfPeople))
                 return BadRequest();
 
             if (string.IsNullOrEmpty(managementmodel.NumberOfPeople))
-                return BadRequest();
+               return BadRequest();
 
             if (string.IsNullOrEmpty(managementmodel.BranchCode))
                 return BadRequest();
@@ -83,6 +83,8 @@ public class BookingController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+
 
     [HttpDelete]
     [Route("/api/Booking/{id}")]

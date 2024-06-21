@@ -53,6 +53,8 @@ public class AdminController : ControllerBase
                 return NotFound("No active user found for the given branch code.");
             }
 
+           
+
             return Ok(user);
         }
         catch (Exception ex)
