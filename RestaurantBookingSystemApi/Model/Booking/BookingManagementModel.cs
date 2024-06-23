@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using RestaurantBookingSystemApi.Model.Tables;
+using System.ComponentModel.DataAnnotations;
 
 namespace RestaurantBookingSystemApi.Model.Booking;
 
@@ -14,4 +15,5 @@ public class BookingManagementModel
     public string TableNumber {  get; set; }
     public string UserName {  get; set; }
     public bool IsBooked {  get; set; }
+
 }

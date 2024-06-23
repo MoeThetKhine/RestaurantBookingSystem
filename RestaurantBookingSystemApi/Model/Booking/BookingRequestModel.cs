@@ -6,7 +6,7 @@ namespace RestaurantBookingSystemApi.Model.Booking
     public class BookingRequestModel
     {
         [Key]
-        public long BookingId { get; set; }
+       // public long BookingId { get; set; }
         public string CustomerName { get; set; }
         public string PhoneNumber { get; set; }
         public string NumberOfPeople { get; set; }
@@ -15,6 +15,7 @@ namespace RestaurantBookingSystemApi.Model.Booking
         public string TableNumber { get; set; }
         public string UserName { get; set; }
         public bool IsBooked { get; set; }
-       // public List<TableRequestModel> TableBooking { get; set; }
+        public List<TableRequestModel> TableBooking { get; set; }
+
     }
 }

@@ -1,12 +1,14 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantBookingSystemApi.Data;
+using RestaurantBookingSystemApi.Mapper;
 using RestaurantBookingSystemApi.Model.Booking;
 
 namespace RestaurantBookingSystemApi.Controllers;
 
-public class BookingController : ControllerBase
+public class BookingController : BaseController
 {
     private readonly AppDbContext _appDbContext;
 
@@ -40,19 +42,19 @@ public class BookingController : ControllerBase
     {
         try
         {
-           #region Validation
+            #region Validation
 
             if (string.IsNullOrEmpty(managementmodel.CustomerName))
                 return BadRequest();
 
-           if (string.IsNullOrEmpty(managementmodel.PhoneNumber))
-               return BadRequest();
+            if (string.IsNullOrEmpty(managementmodel.PhoneNumber))
+                return BadRequest();
 
             if (string.IsNullOrEmpty(managementmodel.NumberOfPeople))
                 return BadRequest();
 
             if (string.IsNullOrEmpty(managementmodel.NumberOfPeople))
-               return BadRequest();
+                return BadRequest();
 
             if (string.IsNullOrEmpty(managementmodel.BranchCode))
                 return BadRequest();
@@ -86,6 +88,85 @@ public class BookingController : ControllerBase
 
 
 
+    [HttpPost]
+    public async Task<IActionResult> CreateTables([FromBody] BookingRequestModel requestModel)
+    {
+
+
+        await using var transaction = await _appDbContext.Database.BeginTransactionAsync();
+
+        try
+        {
+
+            if (string.IsNullOrEmpty(requestModel.CustomerName))
+                return BadRequest();
+
+            if (string.IsNullOrEmpty(requestModel.PhoneNumber))
+                return BadRequest();
+
+            if (string.IsNullOrEmpty(requestModel.NumberOfPeople))
+                return BadRequest();
+
+            if (string.IsNullOrEmpty(requestModel.NumberOfPeople))
+                return BadRequest();
+
+            if (string.IsNullOrEmpty(requestModel.BranchCode))
+                return BadRequest();
+
+            if (string.IsNullOrEmpty(requestModel.TableNumber))
+                return BadRequest();
+
+            if (string.IsNullOrEmpty(requestModel.UserName))
+                return BadRequest();
+
+            if (requestModel.BookingDateAndTime < DateTime.Now || requestModel.BookingDateAndTime == default)
+                return BadRequest("Your Booking is not approved");
+
+            if(requestModel.TableBooking is null)
+                return BadRequest();
+
+            // Check if the table is available
+            var table = await _appDbContext.Tables
+                    .Where(t => t.TableNumber == requestModel.TableNumber && t.IsAvailable)
+                    .FirstOrDefaultAsync();
+
+            if (table == null)
+            {
+                return BadRequest("Table is not available.");
+            }
+
+            // Create a new booking
+            var booking = new Booking
+            {
+                TableNumber = requestModel.TableNumber,
+                BookingDate = requestModel.BookingDateAndTime
+                // Set other properties as needed
+            };
+            await _appDbContext.Booking.AddAsync(booking);
+
+            // Mark the table as unavailable
+            table.IsAvailable = false;
+            _appDbContext.Tables.Update(table);
+
+            // Save changes
+            int bookingResult = await _appDbContext.SaveChangesAsync();
+
+            if (bookingResult > 0)
+            {
+                await transaction.CommitAsync();
+                return CreatedAtAction(nameof(GetBooking), new { num = requestModel.TableNumber }, booking);
+            }
+
+            await transaction.RollbackAsync();
+            return BadRequest("Failed to book the table.");
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            return StatusCode(500, "Internal server error.");
+        }
+    }
+
     [HttpDelete]
     [Route("/api/Booking/{id}")]
     public async Task<IActionResult> DeleteBooking(long id)
@@ -114,3 +195,9 @@ public class BookingController : ControllerBase
         }
     }
 }
+
+//internal class Booking : BookingManagementModel
+//{
+//    public string TableNumber { get; set; }
+//    public DateTime BookingDate { get; set; }
+//}
