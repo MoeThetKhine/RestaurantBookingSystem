@@ -15,7 +15,7 @@ namespace RestaurantBookingSystemApi.Model.Booking
         public string TableNumber { get; set; }
         public string UserName { get; set; }
         public bool IsBooked { get; set; }
-        public List<TableRequestModel> TableBooking { get; set; }
+       
 
     }
 }

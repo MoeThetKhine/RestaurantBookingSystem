@@ -3,12 +3,11 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RestaurantBookingSystemApi.Data;
-using RestaurantBookingSystemApi.Mapper;
 using RestaurantBookingSystemApi.Model.Booking;
 
 namespace RestaurantBookingSystemApi.Controllers;
 
-public class BookingController : BaseController
+public class BookingController : ControllerBase
 {
     private readonly AppDbContext _appDbContext;
 
@@ -34,8 +33,6 @@ public class BookingController : BaseController
             throw new Exception(ex.Message);
         }
     }
-
-
     [HttpPost]
     [Route("/api/Booking")]
     public async Task<IActionResult> CreateBooking([FromBody] BookingManagementModel managementmodel)
@@ -67,14 +64,16 @@ public class BookingController : BaseController
 
             if (managementmodel.BookingDateAndTime < DateTime.Now || managementmodel.BookingDateAndTime == default)
                 return BadRequest("Your Booking is not approved");
+            
 
             #endregion
 
             var item = await _appDbContext.Booking
                 .AsNoTracking()
-                .FirstOrDefaultAsync(x => x.CustomerName == managementmodel.CustomerName && x.BookingDateAndTime == managementmodel.BookingDateAndTime && x.IsBooked);
+                .FirstOrDefaultAsync(x => (x.CustomerName == managementmodel.CustomerName && x.BookingDateAndTime == managementmodel.BookingDateAndTime && x.IsBooked) 
+                || (x.TableNumber == managementmodel.TableNumber && x.BranchCode== managementmodel.BranchCode && x.IsBooked) );
             if (item is not null)
-                return Conflict("Customer with same Booking Date/Time is already exist");
+                return Conflict("Customer with same Booking Date/Time is already exist or Table is not available");
             await _appDbContext.Booking.AddAsync(managementmodel);
             int result = await _appDbContext.SaveChangesAsync();
 
@@ -87,85 +86,62 @@ public class BookingController : BaseController
     }
 
 
+    //[HttpPost]
+    //[Route("/api/Booking")]
+    //public async Task<IActionResult> CreateBooking([FromBody] BookingManagementModel managementmodel)
+    //{
+    //    try
+    //    {
+    //        #region Validation
 
-    [HttpPost]
-    public async Task<IActionResult> CreateTables([FromBody] BookingRequestModel requestModel)
-    {
+    //        if (string.IsNullOrEmpty(managementmodel.CustomerName))
+    //            return BadRequest("Customer Name is empty.Please Fill Customer Name");
 
+    //        if (string.IsNullOrEmpty(managementmodel.PhoneNumber))
+    //            return BadRequest("Phone Number is empty.Please Fill Phone Number");
 
-        await using var transaction = await _appDbContext.Database.BeginTransactionAsync();
+    //        if (string.IsNullOrEmpty(managementmodel.NumberOfPeople))
+    //            return BadRequest("Please Fill Number Of People");
 
-        try
-        {
+    //        if (string.IsNullOrEmpty(managementmodel.BranchCode))
+    //            return BadRequest("Please Fill Branch Code");
 
-            if (string.IsNullOrEmpty(requestModel.CustomerName))
-                return BadRequest();
+    //        if (string.IsNullOrEmpty(managementmodel.TableNumber))
+    //            return BadRequest("Please Fill Table Number");
 
-            if (string.IsNullOrEmpty(requestModel.PhoneNumber))
-                return BadRequest();
+    //        if (string.IsNullOrEmpty(managementmodel.UserName))
+    //            return BadRequest("Please Fill UserName(Admin)");
 
-            if (string.IsNullOrEmpty(requestModel.NumberOfPeople))
-                return BadRequest();
+    //        if (managementmodel.BookingDateAndTime < DateTime.Now || managementmodel.BookingDateAndTime == default)
+    //            return BadRequest("Your Booking is not approved");
 
-            if (string.IsNullOrEmpty(requestModel.NumberOfPeople))
-                return BadRequest();
+    //        #endregion
 
-            if (string.IsNullOrEmpty(requestModel.BranchCode))
-                return BadRequest();
+    //        //var item = await _appDbContext.Booking
+    //        //    .AsNoTracking()
+    //        //    .FirstOrDefaultAsync(x => x.CustomerName == managementmodel.CustomerName && x.BookingDateAndTime == managementmodel.BookingDateAndTime && x.IsBooked);
+    //        //if (item is not null)
+    //        //    return Conflict("Customer with same Booking Date/Time is already exist");
+    //        //await _appDbContext.Booking.AddAsync(managementmodel);
+    //        //int result = await _appDbContext.SaveChangesAsync();
 
-            if (string.IsNullOrEmpty(requestModel.TableNumber))
-                return BadRequest();
+    //        //return result > 0 ? StatusCode(201, "Creating Successful") : BadRequest("Creating Fail");
+    //        var item = await _appDbContext.Booking
+    //            .AsNoTracking()
+    //            .FirstOrDefaultAsync(x => x.CustomerName == managementmodel.CustomerName && x.BookingDateAndTime == managementmodel.BookingDateAndTime && x.IsBooked);
+    //        if (item is not null)
+    //            return Conflict("Customer with same Booking Date/Time is already exist");
+    //        await _appDbContext.Booking.AddAsync(managementmodel);
+    //        int result = await _appDbContext.SaveChangesAsync();
 
-            if (string.IsNullOrEmpty(requestModel.UserName))
-                return BadRequest();
+    //        return result > 0 ? StatusCode(201, "Creating Successful") : BadRequest("Creating Fail");
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        throw new Exception(ex.Message);
+    //    }
+    //}
 
-            if (requestModel.BookingDateAndTime < DateTime.Now || requestModel.BookingDateAndTime == default)
-                return BadRequest("Your Booking is not approved");
-
-            if(requestModel.TableBooking is null)
-                return BadRequest();
-
-            // Check if the table is available
-            var table = await _appDbContext.Tables
-                    .Where(t => t.TableNumber == requestModel.TableNumber && t.IsAvailable)
-                    .FirstOrDefaultAsync();
-
-            if (table == null)
-            {
-                return BadRequest("Table is not available.");
-            }
-
-            // Create a new booking
-            var booking = new Booking
-            {
-                TableNumber = requestModel.TableNumber,
-                BookingDate = requestModel.BookingDateAndTime
-                // Set other properties as needed
-            };
-            await _appDbContext.Booking.AddAsync(booking);
-
-            // Mark the table as unavailable
-            table.IsAvailable = false;
-            _appDbContext.Tables.Update(table);
-
-            // Save changes
-            int bookingResult = await _appDbContext.SaveChangesAsync();
-
-            if (bookingResult > 0)
-            {
-                await transaction.CommitAsync();
-                return CreatedAtAction(nameof(GetBooking), new { num = requestModel.TableNumber }, booking);
-            }
-
-            await transaction.RollbackAsync();
-            return BadRequest("Failed to book the table.");
-        }
-        catch (Exception ex)
-        {
-            await transaction.RollbackAsync();
-            return StatusCode(500, "Internal server error.");
-        }
-    }
 
     [HttpDelete]
     [Route("/api/Booking/{id}")]
@@ -196,8 +172,3 @@ public class BookingController : BaseController
     }
 }
 
-//internal class Booking : BookingManagementModel
-//{
-//    public string TableNumber { get; set; }
-//    public DateTime BookingDate { get; set; }
-//}

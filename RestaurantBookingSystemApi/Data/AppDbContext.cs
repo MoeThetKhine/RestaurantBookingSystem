@@ -16,6 +16,5 @@ public class AppDbContext : DbContext
     public DbSet<BranchManagementModel> Branches { get; set; }
     public DbSet<TablesManagementModel> Tables { get; set; }
     public DbSet<BookingManagementModel> Booking { get; set; }
-    //public DbSet<BookingRequestModel> BookingTable { get; set; }
 
 }
