@@ -13,24 +13,8 @@ public class TableController : ControllerBase
     {
         _appDbContext = appDbContext;
     }
-    /*[HttpGet]
-    [Route("/api/Tables")]
+    #region Table List
 
-    public async Task<IActionResult> GetTables()
-    {
-        try
-        {
-            List<TablesManagementModel> lst = await _appDbContext.Tables
-                .AsNoTracking()
-                .ToListAsync();
-            return Ok(lst);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
-    }
-    */
     [HttpGet]
     [Route("/api/Tables/{branchCode}")]
     public async Task<IActionResult> GetTables(string branchCode)
@@ -52,6 +36,10 @@ public class TableController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+    #endregion
+
+    #region Create New Table
 
     [HttpPost]
     [Route("/api/Tables")]
@@ -91,6 +79,11 @@ public class TableController : ControllerBase
         }
     }
 
+
+    #endregion
+
+    #region Change IsAvailable True
+
     [HttpPut]
     [Route("/api/Tables")]
     public async Task<IActionResult> UpdateTables([FromBody] TableRequestModel requestModel, long id)
@@ -125,6 +118,10 @@ public class TableController : ControllerBase
         }
     }
 
+    #endregion
+
+    #region IsAvailable False when table is booked
+
     [HttpDelete]
     [Route("/api/Tables/{id}")]
     public async Task<IActionResult> DeleteTables(long id)
@@ -151,4 +148,13 @@ public class TableController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+    #endregion
+
+
+
+
+
+
+
 }

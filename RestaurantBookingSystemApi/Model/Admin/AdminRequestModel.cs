@@ -4,8 +4,6 @@ namespace RestaurantBookingSystemApi.Model.Admin;
 
 public class AdminRequestModel
 {
-
-
     [Required]
     [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,16}$",
         ErrorMessage = "Password must be within 8  and 16 characters long and contain at least an uppercase letter, " +
