@@ -13,6 +13,7 @@ public class BranchController : ControllerBase
     {
         _appDbContext = appDbContext;
     }
+    #region Branch List
 
     [HttpGet]
     [Route("/api/Branch")]
@@ -20,7 +21,6 @@ public class BranchController : ControllerBase
     {
         try
         {
-           // List<BranchManagementModel> lst = await _appDbContext.Branches
             var branch = await _appDbContext.Branches
             .Where(b => b.IsActive == true)
             .AsNoTracking()
@@ -34,13 +34,17 @@ public class BranchController : ControllerBase
         }
     }
 
+    #endregion
+
+    #region Create New Branch
+
     [HttpPost]
     [Route("/api/Branch")]
     public async Task<IActionResult> CreateBranches([FromBody] BranchManagementModel managementmodel)
     {
         try
         {
-            if (string.IsNullOrEmpty(managementmodel.BranchCode)) 
+            if (string.IsNullOrEmpty(managementmodel.BranchCode))
                 return BadRequest();
             if (string.IsNullOrEmpty(managementmodel.BranchName))
                 return BadRequest();
@@ -63,6 +67,10 @@ public class BranchController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+    #endregion
+
+    #region Delete Branch
 
     [HttpDelete]
     [Route("/api/Branch")]
@@ -92,4 +100,9 @@ public class BranchController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+    #endregion
+
+
+
 }
