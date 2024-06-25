@@ -16,6 +16,7 @@ public class BookingController : ControllerBase
     {
         _appDbContext = appDbContext;
     }
+    #region Booking List By BranchCode
 
     [HttpGet]
     [Route("/api/Booking/branchCode")]
@@ -39,6 +40,11 @@ public class BookingController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+    #endregion
+
+    #region Create Booking
+
     [HttpPost]
     [Route("/api/Booking")]
     public async Task<IActionResult> CreateBooking([FromBody] BookingManagementModel managementmodel)
@@ -72,8 +78,8 @@ public class BookingController : ControllerBase
             var item = await _appDbContext.Booking
                 .AsNoTracking()
                 .FirstOrDefaultAsync
-                (x => (x.CustomerName == managementmodel.CustomerName && x.BookingDateAndTime == managementmodel.BookingDateAndTime && x.IsBooked) 
-                || (x.TableNumber == managementmodel.TableNumber && x.BranchCode== managementmodel.BranchCode && x.IsBooked) );
+                (x => (x.CustomerName == managementmodel.CustomerName && x.BookingDateAndTime == managementmodel.BookingDateAndTime && x.IsBooked)
+                || (x.TableNumber == managementmodel.TableNumber && x.BranchCode == managementmodel.BranchCode && x.IsBooked));
             if (item is not null)
                 return Conflict("Customer with same Booking Date/Time is already exist or Table is not available");
             await _appDbContext.Booking.AddAsync(managementmodel);
@@ -86,6 +92,11 @@ public class BookingController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+    #endregion
+
+    #region DeleteBooking
+
     [HttpDelete]
     [Route("/api/Booking/{id}")]
     public async Task<IActionResult> DeleteBooking(long id)
@@ -113,5 +124,10 @@ public class BookingController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+    #endregion
+
+
+
 }
 
