@@ -16,22 +16,7 @@ public class AdminController : ControllerBase
         _appDbContext = appDbContext;
     }
 
-    /*[HttpGet]
-    [Route("/api/User/branchcode")]
-    public async Task<IActionResult> GetUsers(string branchcode)
-    {
-        try
-        {
-            List<AdminManagementModel> lst = await _appDbContext.Users
-                .AsNoTracking()
-                .ToListAsync();
-            return Ok(lst);
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
-    } */
+    #region Admin List
 
     [HttpGet]
     [Route("/api/User/branchcode")]
@@ -39,11 +24,6 @@ public class AdminController : ControllerBase
     {
         try
         {
-            //if (string.IsNullOrEmpty(branchcode))
-            //{
-            //    return BadRequest("Branch code cannot be null or empty.");
-            //}
-            // List<TablesManagementModel> lst = await _appDbContext.Users
             var user = await _appDbContext.Users
                 .Where(b => b.BranchCode == branchcode && b.IsActive == true)
                 .AsNoTracking()
@@ -63,12 +43,18 @@ public class AdminController : ControllerBase
         }
     }
 
+    #endregion
+
+    #region CreateAdmin
+
     [HttpPost]
     [Route("/api/User")]
     public async Task<IActionResult> CreateUser([FromBody] AdminManagementModel managementModel)
     {
         const string pattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
         const string passpattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
+
+        #region validate Admin
 
         try
         {
@@ -93,6 +79,8 @@ public class AdminController : ControllerBase
             if (managementModel.BranchCode.Length != 5)
                 return BadRequest("BranchCode must be only 5  character");
 
+            #endregion
+
             var item = await _appDbContext.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.BranchCode == managementModel.BranchCode && x.IsActive);
@@ -108,24 +96,20 @@ public class AdminController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+    #endregion
+
+    #region UpdatePassword
+
     [HttpPut]
-    [Route("/api/User")]
-    public async Task<IActionResult> UpdateUser([FromBody] AdminManagementModel requestModel, long id)
+    [Route("/api/User/{id}")]
+    public async Task<IActionResult> UpdatePassword([FromBody] AdminRequestModel requestModel, long id)
     {
         const string passpattern = @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$";
         try
         {
-           /* if (string.IsNullOrEmpty(requestModel.UserName))
-                return BadRequest("UserName cannot empty");
-            if (string.IsNullOrEmpty(requestModel.Email))
-                return BadRequest("Email cannot empty");
-            if (string.IsNullOrEmpty(requestModel.Password))
-                return BadRequest("Password cannot empty");
-            if (string.IsNullOrEmpty(requestModel.BranchCode))
-                return BadRequest("BranchCode cannot empty");
-            if (string.IsNullOrEmpty(requestModel.UserRole))
-                return BadRequest("UserRole cannot empty");*/
-             if (!(Regex.IsMatch(requestModel.Password.ToString(), passpattern)))
+
+            if (!(Regex.IsMatch(requestModel.Password.ToString(), passpattern)))
                 return BadRequest("Password must be at least 8 characters long and " +
                     "contain an uppercase " + "letter, " +
                     "a lowercase letter, a number, and a special character.");
@@ -156,6 +140,12 @@ public class AdminController : ControllerBase
         }
     }
 
+
+
+    #endregion
+
+    #region DeleteAdmin
+
     [HttpDelete]
     [Route("/api/User/{id}")]
     public async Task<IActionResult> DeleteUser(long id)
@@ -182,4 +172,8 @@ public class AdminController : ControllerBase
             throw new Exception(ex.Message);
         }
     }
+
+    #endregion
+
+
 }
