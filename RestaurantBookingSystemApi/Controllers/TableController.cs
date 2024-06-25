@@ -82,7 +82,7 @@ public class TableController : ControllerBase
 
     #endregion
 
-    #region Change IsAvailable True
+    #region Change IsAvailable False to True
 
     [HttpPut]
     [Route("/api/Tables")]
@@ -110,7 +110,7 @@ public class TableController : ControllerBase
             _appDbContext.Entry(item).State = EntityState.Modified;
             int result = await _appDbContext.SaveChangesAsync();
 
-            return result > 0 ? StatusCode(202, "Updating Successful") : BadRequest("Updating Fail");
+            return result > 0 ? StatusCode(202, "This table is available") : BadRequest("Updating Fail");
         }
         catch (Exception ex)
         {
@@ -141,7 +141,7 @@ public class TableController : ControllerBase
             _appDbContext.Entry(item).State = EntityState.Modified;
             int result = await _appDbContext.SaveChangesAsync();
 
-            return result > 0 ? StatusCode(202, "Deleting Successful") : BadRequest("Deleting Fail");
+            return result > 0 ? StatusCode(202, "This table is booked") : BadRequest();
         }
         catch (Exception ex)
         {
